@@ -296,7 +296,7 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
             final Intent intent = new Intent();
             intent.putExtra("mp_message", "MESSAGE");
             intent.putExtra("mp_subtxt", "SUBTEXT");
-            Notification notification = mpPushSpy.createNotification(intent);
+            mpPushSpy.createNotification(intent);
             verify(builderSpy).setSubText("SUBTEXT");
         }
     }
@@ -305,7 +305,7 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             final Intent intent = new Intent();
             intent.putExtra("mp_message", "MESSAGE");
-            Notification notification = mpPushSpy.createNotification(intent);
+            mpPushSpy.createNotification(intent);
             verify(builderSpy, never()).setSubText(any(String.class));
         }
     }
@@ -314,14 +314,14 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
         final Intent intent = new Intent();
         intent.putExtra("mp_message", "MESSAGE");
         intent.putExtra("mp_ticker", "TICK");
-        Notification notification = mpPushSpy.createNotification(intent);
+        mpPushSpy.createNotification(intent);
         verify(builderSpy).setTicker("TICK");
     }
 
     public void testNoTicker() {
         final Intent intent = new Intent();
         intent.putExtra("mp_message", "MESSAGE");
-        Notification notification = mpPushSpy.createNotification(intent);
+        mpPushSpy.createNotification(intent);
         verify(builderSpy).setTicker("MESSAGE");
     }
 
@@ -346,9 +346,14 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
         final Intent intent = new Intent();
         intent.putExtra("mp_message", "MESSAGE");
         intent.putExtra("mp_time", "2014-10-02T15:01:23.045123456Z");
+
         mpPushSpy.createNotification(intent);
-        verify(builderSpy).setShowWhen(true);
+
         verify(builderSpy).setWhen(1412280083045L);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            verify(builderSpy).setShowWhen(true);
+        }
     }
 
     public void testNoTimestamp() {
