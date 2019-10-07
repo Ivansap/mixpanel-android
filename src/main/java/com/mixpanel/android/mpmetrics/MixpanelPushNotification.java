@@ -168,7 +168,6 @@ public class MixpanelPushNotification {
         );
 
         builder.
-                setDefaults(MPConfig.getInstance(context).getNotificationDefaults()).
                 setContentTitle(data.title).
                 setContentText(data.message).
                 setTicker(data.ticker == null ? data.message : data.ticker).
@@ -316,6 +315,8 @@ public class MixpanelPushNotification {
             mNotificationManager.createNotificationChannel(channel);
 
             builder.setChannelId(channelId);
+        } else {
+            builder.setDefaults(MPConfig.getInstance(context).getNotificationDefaults());
         }
     }
 
