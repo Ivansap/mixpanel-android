@@ -22,9 +22,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MixpanelPushNotification {
     protected final String LOGTAG = "MixpanelAPI.MixpanelPushNotification";
@@ -322,13 +326,18 @@ public class MixpanelPushNotification {
     }
 
     protected void maybeSetTime() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             builder.setShowWhen(true);
-            if (data.timeString == null) {
-                builder.setWhen(now);
-            } else {
-                Instant instant = Instant.parse(data.timeString);
-                builder.setWhen(instant.toEpochMilli());
+        }
+
+        if (data.timeString == null) {
+            builder.setWhen(now);
+        } else {
+            try {
+                Date dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).parse(data.timeString);
+                builder.setWhen(dt.getTime());
+            } catch (ParseException e) {
+                MPLog.e(LOGTAG,"Unable to parse date string into datetime: " + data.timeString + " (" + e.toString() + ")");
             }
         }
     }

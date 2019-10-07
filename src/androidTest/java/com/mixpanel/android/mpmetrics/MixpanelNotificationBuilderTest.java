@@ -343,23 +343,18 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
     }
 
     public void testTimestamp() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            final Intent intent = new Intent();
-            intent.putExtra("mp_message", "MESSAGE");
-            intent.putExtra("mp_time", "2014-10-02T15:01:23.045123456Z");
-            Notification notification = mpPushSpy.createNotification(intent);
-            Instant instant = Instant.parse("2014-10-02T15:01:23.045123456Z");
-            verify(builderSpy).setShowWhen(true);
-            verify(builderSpy).setWhen(instant.toEpochMilli());
-        }
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        intent.putExtra("mp_time", "2014-10-02T15:01:23.045123456Z");
+        mpPushSpy.createNotification(intent);
+        verify(builderSpy).setShowWhen(true);
+        verify(builderSpy).setWhen(1412280083045L);
     }
 
     public void testNoTimestamp() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            final Intent intent = new Intent();
-            intent.putExtra("mp_message", "MESSAGE");
-            verify(builderSpy, never()).setWhen(any(Long.class));
-        }
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        verify(builderSpy, never()).setWhen(any(Long.class));
     }
 
     public void testVisibility() {
