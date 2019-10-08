@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,9 @@ import java.util.Locale;
 public class MixpanelPushNotification {
     protected final String LOGTAG = "MixpanelAPI.MixpanelPushNotification";
     public NotificationData data;
+
+    static final String DATETIME_NO_TZ = "yyyy-MM-dd'T'HH:mm:ss";
+    static final String DATETIME_WITH_TZ = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     public MixpanelPushNotification(Context context, ResourceIds drawableIds) {
         this(context, new Notification.Builder(context), drawableIds, System.currentTimeMillis());
@@ -334,12 +338,21 @@ public class MixpanelPushNotification {
         if (data.timeString == null) {
             builder.setWhen(now);
         } else {
+            Date dt = null;
             try {
-                Date dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).parse(data.timeString);
-                builder.setWhen(dt.getTime());
+                dt = new SimpleDateFormat(DATETIME_NO_TZ, Locale.US).parse(data.timeString);
             } catch (ParseException e) {
-                MPLog.e(LOGTAG,"Unable to parse date string into datetime: " + data.timeString + " (" + e.toString() + ")");
+                try {
+                    dt = new SimpleDateFormat(DATETIME_WITH_TZ, Locale.US).parse(data.timeString);
+                } catch (ParseException e2) {
+                    MPLog.d(LOGTAG,"Unable to parse date string into datetime: " + data.timeString + " (" + e2.toString() + ")");
+                }
+            } finally {
+                if (null != dt) {
+                    builder.setWhen(dt.getTime());
+                }
             }
+
         }
     }
 

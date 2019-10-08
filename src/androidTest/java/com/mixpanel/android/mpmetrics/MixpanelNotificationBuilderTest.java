@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class MixpanelNotificationBuilderTest extends AndroidTestCase {
 
@@ -345,15 +346,48 @@ public class MixpanelNotificationBuilderTest extends AndroidTestCase {
     public void testTimestamp() {
         final Intent intent = new Intent();
         intent.putExtra("mp_message", "MESSAGE");
-        intent.putExtra("mp_time", "2014-10-02T15:01:23.045123456Z");
+        intent.putExtra("mp_time", "2014-10-02T15:01:23+0000");
 
         mpPushSpy.createNotification(intent);
 
-        verify(builderSpy).setWhen(1412280083045L);
+        verify(builderSpy).setWhen(1412262083000L);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             verify(builderSpy).setShowWhen(true);
         }
+    }
+
+    public void testTimestampUTC() {
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        intent.putExtra("mp_time", "2014-10-02T15:01:23+0000");
+        mpPushSpy.createNotification(intent);
+        verify(builderSpy).setWhen(1412262083000L);
+    }
+
+    public void testTimestampZulu() {
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        intent.putExtra("mp_time", "2014-10-02T15:01:23Z");
+        mpPushSpy.createNotification(intent);
+        verify(builderSpy).setWhen(1412262083000L);
+    }
+
+    public void testTimestampCentral() {
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        intent.putExtra("mp_time", "2014-10-02T15:01:23-0500");
+        mpPushSpy.createNotification(intent);
+        verify(builderSpy).setWhen(1412280083000L);
+    }
+
+    public void testTimestampUserLocal() {
+        final Intent intent = new Intent();
+        intent.putExtra("mp_message", "MESSAGE");
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
+        intent.putExtra("mp_time", "2014-10-02T15:01:23");
+        mpPushSpy.createNotification(intent);
+        verify(builderSpy).setWhen(1412287283000L);
     }
 
     public void testNoTimestamp() {
